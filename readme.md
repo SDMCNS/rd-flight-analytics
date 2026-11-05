@@ -32,7 +32,7 @@ This project provides multi-view analytics, single flight deep-dives, fleet regi
 ```text
 ├── prepare.py            # Extracts .gz archives and standardizes input CSVs
 ├── etl.py                # ETL pipeline, spatial indexing, and SQLite ingestion
-├── app_sqlite.py         # Streamlit interactive web dashboard
+├── app2.py               # Streamlit interactive web dashboard
 ├── requirements.txt      # Python dependencies
 └── README.md             # Project documentation
 ```
@@ -51,6 +51,7 @@ pip install streamlit pandas numpy scipy shapely folium streamlit-folium plotly
 
 ## 🚀 Usage Guide
 
+Download a dataset from "https://ext.eurocontrol.int/prisme_data_provision_hmi/" (registration  and access request neeeded)
 Place your raw Eurocontrol data files (`.gz` archives or extracted CSVs) into the root project directory, then follow these three steps:
 
 ### Step 1: Prepare and Standardize Data
@@ -68,7 +69,7 @@ python etl.py
 ### Step 3: Launch the Streamlit Dashboard
 Start the interactive web application:
 ```bash
-streamlit run app_sqlite.py
+streamlit run app2.py
 ```
 
 ---
