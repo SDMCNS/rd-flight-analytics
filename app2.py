@@ -75,7 +75,7 @@ if "target_reg" not in st.session_state:
 
 app_mode = st.sidebar.radio(
     "Select Dashboard Mode", 
-    ["Single Flight Analysis", "Aircraft Registration Tracker", "FIR & Route Analytics"],
+    ["Single Flight Analysis", "Aircraft Registration Tracker", "FIR & Route Analytics", "Network & Fleet Inferences"],
     index=0 if st.session_state.app_mode == "Single Flight Analysis" else (1 if st.session_state.app_mode == "Aircraft Registration Tracker" else 2)
 )
 st.session_state.app_mode = app_mode
@@ -265,6 +265,102 @@ elif app_mode == "Aircraft Registration Tracker":
                 folium.PolyLine(pts, color="purple", weight=3, opacity=0.8, tooltip=f"Flight {f_id}: {flight['origin_airport']} ➔ {flight['destination_airport']}").add_to(m_reg)
 
         st_folium(m_reg, width=1200, height=600)
+
+elif app_mode == "Network & Fleet Inferences":
+    st.subheader("🌐 Network, City Pairs & Fleet Inferences")
+    st.markdown("Analyze high-density city pairs, airline route dominance, and estimated passenger and cargo throughput based on aircraft capacity mappings.")
+
+    # Dictionary mapping standard ICAO aircraft types to average passenger seats and cargo capacity (tonnes)
+    ac_capacity_map = {
+        'A319': {'seats': 140, 'cargo': 3.5},
+        'A320': {'seats': 180, 'cargo': 4.0},
+        'A321': {'seats': 220, 'cargo': 5.0},
+        'A332': {'seats': 250, 'cargo': 25.0},
+        'A333': {'seats': 277, 'cargo': 30.0},
+        'A359': {'seats': 315, 'cargo': 35.0},
+        'A388': {'seats': 500, 'cargo': 40.0},
+        'B737': {'seats': 160, 'cargo': 3.5},
+        'B738': {'seats': 189, 'cargo': 4.0},
+        'B752': {'seats': 200, 'cargo': 15.0},
+        'B763': {'seats': 269, 'cargo': 22.0},
+        'B772': {'seats': 314, 'cargo': 25.0},
+        'B77W': {'seats': 365, 'cargo': 30.0},
+        'B788': {'seats': 242, 'cargo': 20.0},
+        'B789': {'seats': 290, 'cargo': 25.0},
+        'E145': {'seats': 50, 'cargo': 1.0},
+        'E190': {'seats': 100, 'cargo': 2.0},
+        'F50': {'seats': 50, 'cargo': 1.0},
+    }
+
+    # Enrich summary with capacity estimates
+    df_inf = summary_df.copy()
+    df_inf['Est_Passengers'] = df_inf['AC Type'].map(lambda x: ac_capacity_map.get(str(x).upper(), {'seats': 150})['seats'])
+    df_inf['Est_Cargo_Tonnes'] = df_inf['AC Type'].map(lambda x: ac_capacity_map.get(str(x).upper(), {'cargo': 5.0})['cargo'])
+
+    # Handle cargo-specific market segment adjustments
+    mask_cargo = df_inf['STATFOR Market Segment'].str.contains('Cargo', case=False, na=False)
+    df_inf.loc[mask_cargo, 'Est_Passengers'] = 0
+    df_inf.loc[mask_cargo, 'Est_Cargo_Tonnes'] *= 2.5 # Scale up pure freighters
+
+    tab_pairs, tab_airline, tab_capacity = st.tabs(["🏙️ Top City Pairs", "🏢 Airline Route Dominance", "📦 Passenger & Cargo Inferences"])
+
+    with tab_pairs:
+        st.markdown("### Most Common Airport Pairings (Origin ➔ Destination)")
+        
+        df_inf['City_Pair'] = df_inf['origin_airport'] + " ➔ " + df_inf['destination_airport']
+
+
+        def safe_mode(x):
+            m = x.mode()
+            return m.iloc[0] if not m.empty else 'N/A'
+
+        top_pairs = df_inf.groupby('City_Pair').agg(
+            Flight_Count=('ECTRL ID', 'count'),
+            Avg_Delay_Mins=('dep_delay_mins', 'mean'),
+            Primary_Aircraft=('AC Type', safe_mode)
+        ).reset_index().sort_values(by='Flight_Count', ascending=False).head(15)
+
+        st.dataframe(top_pairs, use_container_width=True)
+
+        fig_pairs = go.Figure(go.Bar(
+            x=top_pairs['Flight_Count'].head(10),
+            y=top_pairs['City_Pair'].head(10),
+            orientation='h',
+            marker_color='royalblue'
+        ))
+        fig_pairs.update_layout(xaxis_title="Number of Flights", yaxis=dict(autorange="reversed"), height=400, margin=dict(l=20, r=20, t=20, b=20))
+        st.plotly_chart(fig_pairs, use_container_width=True)
+
+    with tab_airline:
+        st.markdown("### Airline Network & Route Dominance")
+        
+        airline_routes = df_inf.groupby(['AC Operator', 'City_Pair']).agg(
+            Flight_Count=('ECTRL ID', 'count'),
+            Avg_Distance_Nm=('Actual Distance Flown (nm)', 'mean')
+        ).reset_index().sort_values(by='Flight_Count', ascending=False)
+
+        selected_operator = st.selectbox("Filter by Airline Operator", options=["All Operators"] + sorted(df_inf['AC Operator'].dropna().unique().tolist()))
+        
+        if selected_operator != "All Operators":
+            airline_routes = airline_routes[airline_routes['AC Operator'] == selected_operator]
+
+        st.dataframe(airline_routes.head(20), use_container_width=True)
+
+    with tab_capacity:
+        st.markdown("### Estimated Fleet Passenger & Cargo Throughput")
+        
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Total Estimated Passengers", f"{df_inf['Est_Passengers'].sum():,.0f}")
+        c2.metric("Total Estimated Cargo", f"{df_inf['Est_Cargo_Tonnes'].sum():,.1f} tonnes")
+        c3.metric("Average Flight Distance", f"{df_inf['Actual Distance Flown (nm)'].mean():.0f} nm")
+
+        operator_throughput = df_inf.groupby('AC Operator').agg(
+            Total_Flights=('ECTRL ID', 'count'),
+            Est_Passengers=('Est_Passengers', 'sum'),
+            Est_Cargo_Tonnes=('Est_Cargo_Tonnes', 'sum')
+        ).reset_index().sort_values(by='Est_Passengers', ascending=False)
+
+        st.dataframe(operator_throughput, use_container_width=True)
 
 elif app_mode == "FIR & Route Analytics":
     st.subheader("🌐 FIR & Route Spatial Analytics")
