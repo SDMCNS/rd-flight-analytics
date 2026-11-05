@@ -1,5 +1,8 @@
 # ✈️ Eurocontrol R&D Flight Analysis & Visualization Dashboard
 
+<img width="1000" height="400" alt="Screenshot 2026-11-05 151217" src="https://github.com/user-attachments/assets/80234ae7-f203-43bf-811b-df0cb6b35888" />
+
+
 An end-to-end Python and Streamlit pipeline designed to parse, spatially index, and visualize periodic flight data provided for researchers by **Eurocontrol ARCHIVE Data for R&D** (https://ext.eurocontrol.int/prisme_data_provision_hmi/).
 
 This project provides multi-view analytics, single flight deep-dives, fleet registration tracking, spatial FIR boundary checks, and route analytics using an optimized SQLite backend.
@@ -14,6 +17,13 @@ This project provides multi-view analytics, single flight deep-dives, fleet regi
   * **Single Flight Analysis**: Interactive map comparing actual vs. planned routes, time-based vertical altitude profiles with dotted FIR boundary crossing markers, delay metrics, and full metadata inspection.
   * **Aircraft Registration Tracker**: Track individual aircraft tail numbers across your dataset timeframe, view flight frequency, and map cumulative fleet movements.
   * **FIR & Route Analytics**: Explore Flight Information Regions, toggle map layers between enclosed airports and intersecting routes, and analyze traffic volume breakdowns (weekday and hourly distributions).
+
+<img width="400" height="250" alt="Screenshot 2026-11-05 151419" src="https://github.com/user-attachments/assets/0a727b3f-4c6c-4a42-878f-12c65ffa919f" />
+<img width="400" height="250" alt="Screenshot 2026-11-05 151336" src="https://github.com/user-attachments/assets/6d3c38b4-f7d3-43fa-8591-9a81522d324a" />
+<img width="400" height="250" alt="Screenshot 2026-11-05 151326" src="https://github.com/user-attachments/assets/eecdeb82-8958-41b4-9df1-421e6b8403fa" />
+<img width="400" height="250" alt="Screenshot 2026-11-05 151251" src="https://github.com/user-attachments/assets/6d67ba54-e139-400b-86e0-6215e88ee1b6" />
+<img width="400" height="250" alt="Screenshot 2026-11-05 151217" src="https://github.com/user-attachments/assets/52c6f5e7-8f97-4d22-9642-80bec069f7d6" />
+
 
 ---
 
