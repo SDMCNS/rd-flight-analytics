@@ -1,0 +1,29 @@
+# Large Eurocontrol datasets and SQLite databases
+*.db
+*.csv
+*.gz
+*.parquet
+data/
+
+# Python virtual environment & bytecode
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Build, packaging & test caches
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ectl-flights"
+version = "0.1.0"
+description = "Prepare, load and analyse EUROCONTROL R&D archive flight data."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=1.5",
+    "numpy",
+    "scipy",
+    "shapely>=2.0",
+    "geopy",
+]
+
+[project.optional-dependencies]
+viz = ["folium", "plotly"]
+app = ["folium", "plotly", "streamlit", "streamlit-folium"]
+test = ["pytest"]
+
+[project.scripts]
+ectl = "ectl_flights.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
