@@ -1,6 +1,7 @@
 # Large Eurocontrol datasets and SQLite databases
 *.db
 *.csv
+!airports.csv
 *.gz
 *.parquet
 data/

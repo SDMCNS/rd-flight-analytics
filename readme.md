@@ -48,7 +48,7 @@ Put the files for a period in one directory. `ectl prepare` looks for:
 | `Flight_Points_Filed_*.csv(.gz)` | `planned_flights_anonymized.csv` | Filed flight-plan trajectory points |
 | `fir*.csv(.gz)` | `fir.csv` | FIR boundary polygons |
 | `Route_*.csv(.gz)` | `routes.csv` | ATS route points |
-| `airports*.csv` | `airports.csv` | Airport reference list, e.g. [OurAirports](https://ourairports.com/data/) `airports.csv` |
+| `airports*.csv` | `airports.csv` | Airport reference list (bundled in the repository) |
 
 > **Note:** If more than one file matches a pattern, the first one in alphabetical order is used.
 > Process each period in its own directory.
